@@ -54,14 +54,17 @@ chibis = {
     ]
 }
 
-# Build dropdown options
-every_rarity_options = [f"Every {r}" for r in chibis.keys()]
-all_chibis = [name for names in chibis.values() for name in names]
+# Build single dropdown options
+dropdown_options = ["Every Chibi"]  # First option
+# Add rarities
+dropdown_options += [f"Every {r}" for r in chibis.keys()]
+# Add individual chibis alphabetically
+all_chibis = sorted([name for names in chibis.values() for name in names])
+dropdown_options += all_chibis
 
-# Dropdowns
-st.write("### Select a Chibi or rarity group")
-chibi_choice = st.selectbox("Pick a Chibi:", ["--Select--"] + all_chibis)
-rarity_choice = st.selectbox("Pick 'Every Rarity' option:", ["--Select--"] + every_rarity_options)
+# Dropdown
+st.write("### Select a Chibi, 'Every Rarity' or 'Every Chibi'")
+selection = st.selectbox("Pick an option:", dropdown_options)
 
 # Functions
 def expected_draws_single_chibi(rarity, num_chibis):
@@ -69,32 +72,36 @@ def expected_draws_single_chibi(rarity, num_chibis):
     draws = num_chibis / p_rarity
     return math.ceil(draws)  # round up
 
-def expected_draws_to_get_all(num_chibis, rarity):
-    p_rarity = rarity_chances[rarity] / 100
+def expected_draws_to_get_all(num_chibis, rarity=None):
+    if rarity:
+        p_rarity = rarity_chances[rarity] / 100
+    else:
+        p_rarity = 1  # every chibi, overall probability treated as 1 per draw
     coupon_sum = sum(1 / (i+1) for i in range(num_chibis))
     draws = num_chibis * coupon_sum / p_rarity
     return math.ceil(draws)  # round up
 
 # Display results
-if chibi_choice != "--Select--":
-    # Find the rarity
+if selection == "Every Chibi":
+    total_chibis = sum(len(names) for names in chibis.values())
+    draws = expected_draws_to_get_all(total_chibis)
+    st.write(f"🧮 **Estimated number of draws to get every Chibi:** {draws}")
+elif selection.startswith("Every "):  # Rarity group
+    rarity = selection.split()[1]
+    n = len(chibis[rarity])
+    draws = expected_draws_to_get_all(n, rarity)
+    st.write(f"🧮 **Estimated number of draws to get {selection}:** {draws}")
+else:  # Single chibi
     rarity = None
     for r, names in chibis.items():
-        if chibi_choice in names:
+        if selection in names:
             rarity = r
             break
     if rarity:
         n = len(chibis[rarity])
         chance = (1 / n) * rarity_chances[rarity]
         draws = expected_draws_single_chibi(rarity, n)
-        
-        st.write(f"🎯 **Target:** {chibi_choice}")
+        st.write(f"🎯 **Target:** {selection}")
         st.write(f"🏷️ **Rarity:** {rarity}")
         st.write(f"🎲 **Chance per draw:** {chance:.5f}%")
         st.write(f"🧮 **Expected number of draws to get one:** {draws}")
-
-if rarity_choice != "--Select--":
-    rarity = rarity_choice.split()[1]
-    n = len(chibis[rarity])
-    draws = expected_draws_to_get_all(n, rarity)
-    st.write(f"🧮 **Estimated number of draws to get {rarity_choice}:** {draws}")
