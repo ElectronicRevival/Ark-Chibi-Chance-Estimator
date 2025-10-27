@@ -1,123 +1,103 @@
 # Developed by Ghost
-import streamlit as st
-import math
 
-# Define Chibi lists and rarity chances
+import streamlit as st
+
+# Window title
+st.set_page_config(page_title="Chibi Drop Estimator - Developed by Ghost")
+
+# Rarity chances (in %)
+rarity_chances = {
+    "Common": 89.28,
+    "Uncommon": 9.92,
+    "Rare": 0.5,
+    "Very Rare": 0.2,
+    "Legendary": 0.1
+}
+
+# Chibis per rarity (cleaned names)
 chibis = {
     "Common": [
-        "Chibi-Achatina","Chibi-Allosaurus","Chibi-Amargasaurus","Chibi-Ammonite",
-        "Chibi-Anglerfish","Chibi-Ankylosaurus","Chibi-Baryonyx","Chibi-Beelzebufo",
-        "Chibi-Bulbdog","Chibi-Carno","Chibi-Daeodon","Chibi-Dilophosaur",
-        "Chibi-Direbear","Chibi-Doedicurus","Chibi-Featherlight","Chibi-Gallimimus",
-        "Chibi-Glowtail","Chibi-Iguanodon","Chibi-Kaprosuchus","Chibi-Karkinos",
-        "Chibi-Kentrosaurus","Chibi-Lymantria","Chibi-Maewing","Chibi-Mammoth",
-        "Chibi-Manta","Chibi-Mantis","Chibi-Megalania","Chibi-Megaloceros",
-        "Chibi-Megalodon","Chibi-Megatherium","Chibi-Mesopithecus","Chibi-Moschops",
-        "Chibi-Pachy","Chibi-Paraceratherium","Chibi-Parasaur","Chibi Party Rex",
-        "Chibi-Pelagornis","Chibi-Phiomia","Chibi-Pteranodon","Chibi-Pulmonoscorpius",
-        "Chibi-Raptor","Chibi-Rex","Chibi-Rollrat","Chibi-Sarco","Chibi-Shadowmane",
-        "Chibi-Shinehorn","Chibi-Spino","Chibi-Stego","Chibi-Terror Bird",
-        "Chibi-Thylacoleo","Chibi-Trike","Chibi-Tropeognathus","Chibi-Vulture"
+        "Achatina","Allosaurus","Amargasaurus","Ammonite","Anglerfish","Ankylosaurus","Baryonyx",
+        "Beelzebufo","Bulbdog","Carno","Daeodon","Dilophosaur","Direbear","Doedicurus","Featherlight",
+        "Gallimimus","Glowtail","Iguanodon","Kaprosuchus","Karkinos","Kentrosaurus","Lymantria",
+        "Maewing","Mammoth","Manta","Mantis","Megalania","Megaloceros","Megalodon","Megatherium",
+        "Mesopithecus","Moschops","Pachy","Paraceratherium","Parasaur","Party Rex","Pelagornis",
+        "Phiomia","Pteranodon","Pulmonoscorpius","Raptor","Rex","Rollrat","Sarco","Shadowmane",
+        "Shinehorn","Spino","Stego","Terror Bird","Thylacoleo","Trike","Tropeognathus","Vulture"
     ],
     "Uncommon": [
-        "Chibi-Andrewsarchus","Chibi-Animated Series Raptor","Chibi-Araneo",
-        "Chibi-Archaeopteryx","Chibi-Argentavis","Chibi-Astrodelphis","Chibi-Basilisk",
-        "Chibi-Brontosaurus","Chibi-Carbonemys","Chibi-Castroides","Chibi-Cnidaria",
-        "Chibi-Deinonychus","Chibi-Diplodocus","Chibi-Dodo","Chibi-Dunkleosteus",
-        "Chibi-Equus","Chibi-Gasbag","Chibi-Ghost Mantis","Chibi-Ghost Rex",
-        "Chibi-Giganotosaurus","Chibi-Gigantopithecus","Chibi-Kairuku","Chibi-Microraptor",
-        "Chibi-Mosasaurus","Chibi-Otter","Chibi-Oviraptor","Chibi-Ovis","Chibi-Procoptodon",
-        "Chibi-Purlovia","Chibi-Quetzal","Chibi-Reaper","Chibi-Reindeer","Chibi-Rhino",
-        "Chibi-Rock Golem","Chibi-Tapejara","Chibi-Therizino","Chibi-Thorny Dragon",
-        "Chibi-Troodon","Chibi-Yutyrannus","Teeny Tiny Titano"
+        "Andrewsarchus","Animated Series Raptor","Araneo","Archaeopteryx","Argentavis","Astrodelphis",
+        "Basilisk","Brontosaurus","Carbonemys","Castroides","Cnidaria","Deinonychus","Diplodocus","Dodo",
+        "Dunkleosteus","Equus","Gasbag","Ghost Mantis","Ghost Rex","Giganotosaurus","Gigantopithecus",
+        "Kairuku","Microraptor","Mosasaurus","Otter","Oviraptor","Ovis","Procoptodon","Purlovia","Quetzal",
+        "Reaper","Reindeer","Rhino","Rock Golem","Tapejara","Therizino","Thorny Dragon","Troodon",
+        "Yutyrannus","Teeny Tiny Titano"
     ],
     "Rare": [
-        "Chibi-Bunny","Chibi-Carcharodontosaurus","Chibi-Desmodus","Chibi-Direwolf",
-        "Chibi-Easter Chick","Chibi-Enforcer","Chibi-Fenrir","Chibi-Fjordhawk",
-        "Chibi-Festive Bulbdog","Chibi-Festive Featherlight","Chibi-Festive Glowtail",
-        "Chibi-Festive Shinehorn","Chibi-Gacha Claus","Chibi-Ghost Basilisk","Chibi-Griffin",
-        "Chibi-Managarmr","Chibi-Onyc","Chibi-Plesiosaur","Chibi-Queen Bee","Chibi-Sabertooth",
-        "Chibi-Seeker","Chibi-Skeletal Brontosaurus","Chibi-Skeletal Jerboa","Chibi-Skeletal Quetzal",
-        "Chibi-Skeletal Stego","Chibi-Skeletal Trike","Chibi-Snow Owl","Chibi-Straw Hat Otter",
-        "Chibi-TEK Raptor","Chibi-Tek Stryder","Chibi-Tusoteuthis","Chibi-Velonasaur",
-        "Chibi-Wyvern","Chibi-X-Sabertooth","Pair-o-Saurs Chibi","Chibi-Sinomacrops"
+        "Bunny","Carcharodontosaurus","Desmodus","Direwolf","Easter Chick","Enforcer","Fenrir","Fjordhawk",
+        "Festive Bulbdog","Festive Featherlight","Festive Glowtail","Festive Shinehorn","Gacha Claus",
+        "Ghost Basilisk","Griffin","Managarmr","Onyc","Plesiosaur","Queen Bee","Sabertooth","Seeker",
+        "Skeletal Brontosaurus","Skeletal Jerboa","Skeletal Quetzal","Skeletal Stego","Skeletal Trike",
+        "Snow Owl","Straw Hat Otter","TEK Raptor","Tek Stryder","Tusoteuthis","Velonasaur","Wyvern",
+        "X-Sabertooth","Pair-o-Saurs","Sinomacrops"
     ],
     "Very Rare": [
-        "Chibi-Astrocetus","Chibi-Bloodstalker","Chibi-Bonnet Otter","Chibi-Crystal Wyvern",
-        "Chibi-Deal With It Dodo","Chibi-Dinopithecus","Chibi-Ferox (Small)","Chibi-Ghost Direwolf",
-        "Chibi-Gigantopithecus Chieftan","Chibi-Jerbunny","Chibi-Lovebird","Chibi-Phoenix",
-        "Chibi-Rock Drake","Chibi-Skeletal Carno","Chibi-Skeletal Giganotosaurus","Chibi-Skeletal Raptor",
-        "Chibi-Skeletal Rex","Chibi-Spooky Bulbdog","Chibi-Spring Shinehorn","Chibi-Stuffed Glowtail",
-        "White-Collar Kairuku"
+        "Astrocetus","Bloodstalker","Bonnet Otter","Crystal Wyvern","Deal With It Dodo","Dinopithecus",
+        "Ferox (Small)","Ghost Direwolf","Gigantopithecus Chieftan","Jerbunny","Lovebird","Phoenix",
+        "Rock Drake","Skeletal Carno","Skeletal Giganotosaurus","Skeletal Raptor","Skeletal Rex",
+        "Spooky Bulbdog","Spring Shinehorn","Stuffed Glowtail","White-Collar Kairuku"
     ],
     "Legendary": [
-        "Chibi-Broodmother","Chibi-Ferox (Large)","Chibi-Magmasaur","Chibi-Noglin",
-        "Chibi-Skeletal Wyvern","Chibi-The Witching Owl","Chibi-Unicorn","Chibi-Voidwyrm",
-        "Chibi-Zombie Wyvern","Chibi-Festive Noglin"
+        "Broodmother","Ferox (Large)","Magmasaur","Noglin","Skeletal Wyvern","The Witching Owl",
+        "Unicorn","Voidwyrm","Zombie Wyvern","Festive Noglin"
     ]
 }
 
-rarity_chances = {
-    "Common": 0.8928,
-    "Uncommon": 0.0992,
-    "Rare": 0.005,
-    "Very Rare": 0.002,
-    "Legendary": 0.001
-}
+# Build dropdown options
+every_rarity_options = [f"Every {r}" for r in chibis.keys()]
+all_chibis = [name for names in chibis.values() for name in names]
 
-# Streamlit App
-st.title("ARK Chibi Estimator - Developed by Ghost")
+# Dropdowns
+st.write("### Select a Chibi or rarity group")
+chibi_choice = st.selectbox("Pick a Chibi:", ["--Select--"] + all_chibis)
+rarity_choice = st.selectbox("Pick 'Every Rarity' option:", ["--Select--"] + every_rarity_options)
 
-# Dropdown for selection
-options = ["Every Chibi"]
-for r in chibis.keys():
-    options.append(f"Every {r}")
-for r, names in chibis.items():
-    options.extend(names)
+# Functions
+def expected_draws_single_chibi(rarity, num_chibis):
+    p_rarity = rarity_chances[rarity] / 100
+    return num_chibis / p_rarity
 
-selection = st.selectbox("Select a Chibi, rarity, or 'Every Chibi'", options)
+def expected_draws_to_get_all(num_chibis, rarity):
+    p_rarity = rarity_chances[rarity] / 100
+    coupon_sum = sum(1 / (i+1) for i in range(num_chibis))
+    return num_chibis * coupon_sum / p_rarity
 
-def chance_single(chibi_name):
+def likelihood_in_n_draws(chance_per_draw_percent, draws):
+    p = chance_per_draw_percent / 100
+    return (1 - (1 - p) ** draws) * 100
+
+# Display results
+if chibi_choice != "--Select--":
     # Find the rarity
+    rarity = None
     for r, names in chibis.items():
-        if chibi_name in names:
-            p_rarity = rarity_chances[r]
-            n = len(names)
-            chance = p_rarity / n
-            return chance
-    return None
-
-def expected_draws_single(chibi_name):
-    chance = chance_single(chibi_name)
-    if chance:
-        return 1 / chance
-    return None
-
-def expected_draws_every(rarity=None):
+        if chibi_choice in names:
+            rarity = r
+            break
     if rarity:
-        names = chibis[rarity]
-        p_rarity = rarity_chances[rarity]
-    else:
-        # All Chibis
-        names = [c for lst in chibis.values() for c in lst]
-        p_rarity = 1.0
-    draws = 0.0
-    remaining = len(names)
-    for k in range(len(names)):
-        draws += 1 / (p_rarity * (remaining - k)/len(names))
-    return draws
+        n = len(chibis[rarity])
+        chance = (1 / n) * rarity_chances[rarity]
+        draws = expected_draws_single_chibi(rarity, n)
+        likelihood = likelihood_in_n_draws(chance, 1000)
+        
+        st.write(f"🎯 **Target:** {chibi_choice}")
+        st.write(f"🏷️ **Rarity:** {rarity}")
+        st.write(f"🎲 **Chance per draw:** {chance:.5f}%")
+        st.write(f"🧮 **Expected number of draws to get one:** {draws:.2f}")
+        st.write(f"💡 **Likelihood of obtaining within 1000 draws:** {likelihood:.2f}%")
 
-# Calculation
-if selection.startswith("Every"):
-    if selection == "Every Chibi":
-        draws = expected_draws_every()
-        st.write(f"Expected number of draws to obtain **every Chibi**: {draws:.0f}")
-    else:
-        rarity = selection.split()[1]
-        draws = expected_draws_every(rarity)
-        st.write(f"Expected number of draws to obtain **every {rarity} Chibi**: {draws:.0f}")
-else:
-    chance = chance_single(selection)
-    draws = expected_draws_single(selection)
-    st.write(f"Chance per draw for **{selection}**: {chance*100:.5f}%")
-    st.write(f"Expected number of draws to obtain **{selection}**: {draws:.0f}")
+if rarity_choice != "--Select--":
+    rarity = rarity_choice.split()[1]
+    n = len(chibis[rarity])
+    draws = expected_draws_to_get_all(n, rarity)
+    st.write(f"🧮 **Estimated number of draws to get {rarity_choice}:** {draws:.2f}")
