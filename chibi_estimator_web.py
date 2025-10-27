@@ -48,7 +48,8 @@ rarities = {
 }
 
 # Create combined drop-down list
-dropdown_options = ["Common","Uncommon","Rare","Very Rare","Legendary","Every Chibi"]
+dropdown_options = ["Every Chibi"]  # top
+dropdown_options.extend(["Common","Uncommon","Rare","Very Rare","Legendary"])  # rarities
 for rarity in rarities:
     dropdown_options.extend(rarities[rarity]["chibis"])
 
@@ -57,7 +58,7 @@ st.set_page_config(page_title="Chibi Chance Estimator", page_icon="🐾")
 st.title("Chibi Chance Estimator")
 st.subheader("Developed by Ghost")
 
-selection = st.selectbox("Select a Chibi or rarity:", dropdown_options)
+selection = st.selectbox("Select a Chibi or rarity:", [""] + dropdown_options)  # empty default
 
 def harmonic_sum(n):
     return sum(1.0/i for i in range(1,n+1))
@@ -91,17 +92,19 @@ def expected_draws_every_chibi():
     return math.ceil(total)
 
 # Calculate results
-if selection == "Every Chibi":
+if selection == "":
+    st.write("Please select a chibi from the drop-down menu. You may also type to search for your desired chibi.")
+elif selection == "Every Chibi":
     expected = expected_draws_every_chibi()
     st.write(f"🎯 Target: Every Chibi")
-    st.write(f"🧮 Expected number of draws to get all Chibis: {expected}")
+    st.write(f"🧮 Expected number of draws to get all Chibis: {expected:,}")
 elif selection in rarities:
     expected = expected_draws_every_rarity(selection)
     st.write(f"🎯 Target: Every {selection}")
-    st.write(f"🧮 Expected number of draws to get all {selection} Chibis: {expected}")
+    st.write(f"🧮 Expected number of draws to get all {selection} Chibis: {expected:,}")
 else:
     rarity, chance_percent, expected = expected_draws_single(selection)
     st.write(f"🎯 Target: {selection}")
     st.write(f"🏷️ Rarity: {rarity}")
     st.write(f"🎲 Chance per draw: {chance_percent:.5f}%")
-    st.write(f"🧮 Expected number of draws to get one: {expected}")
+    st.write(f"🧮 Expected number of draws to get one: {expected:,}")
