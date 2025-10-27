@@ -54,7 +54,7 @@ for rarity in rarities:
     dropdown_options.extend(rarities[rarity]["chibis"])
 
 # Streamlit interface
-st.set_page_config(page_title="Ark: Survival Evolved Chibi Chance Estimator v1.0", page_icon="🐾")
+st.set_page_config(page_title="Ark Survival Evolved Chibi Probability Tool", page_icon="🐾")
 st.title("Ark: Survival Evolved Chibi Chance Estimator v1.0")
 st.subheader("Developed by Ghost")
 
