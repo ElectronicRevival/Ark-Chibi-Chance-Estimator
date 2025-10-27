@@ -1,6 +1,7 @@
 # Developed by Ghost
 
 import streamlit as st
+import math
 
 # Window title
 st.set_page_config(page_title="Chibi Drop Estimator - Developed by Ghost")
@@ -65,16 +66,14 @@ rarity_choice = st.selectbox("Pick 'Every Rarity' option:", ["--Select--"] + eve
 # Functions
 def expected_draws_single_chibi(rarity, num_chibis):
     p_rarity = rarity_chances[rarity] / 100
-    return num_chibis / p_rarity
+    draws = num_chibis / p_rarity
+    return math.ceil(draws)  # round up
 
 def expected_draws_to_get_all(num_chibis, rarity):
     p_rarity = rarity_chances[rarity] / 100
     coupon_sum = sum(1 / (i+1) for i in range(num_chibis))
-    return num_chibis * coupon_sum / p_rarity
-
-def likelihood_in_n_draws(chance_per_draw_percent, draws):
-    p = chance_per_draw_percent / 100
-    return (1 - (1 - p) ** draws) * 100
+    draws = num_chibis * coupon_sum / p_rarity
+    return math.ceil(draws)  # round up
 
 # Display results
 if chibi_choice != "--Select--":
@@ -88,16 +87,14 @@ if chibi_choice != "--Select--":
         n = len(chibis[rarity])
         chance = (1 / n) * rarity_chances[rarity]
         draws = expected_draws_single_chibi(rarity, n)
-        likelihood = likelihood_in_n_draws(chance, 1000)
         
         st.write(f"🎯 **Target:** {chibi_choice}")
         st.write(f"🏷️ **Rarity:** {rarity}")
         st.write(f"🎲 **Chance per draw:** {chance:.5f}%")
-        st.write(f"🧮 **Expected number of draws to get one:** {draws:.2f}")
-        st.write(f"💡 **Likelihood of obtaining within 1000 draws:** {likelihood:.2f}%")
+        st.write(f"🧮 **Expected number of draws to get one:** {draws}")
 
 if rarity_choice != "--Select--":
     rarity = rarity_choice.split()[1]
     n = len(chibis[rarity])
     draws = expected_draws_to_get_all(n, rarity)
-    st.write(f"🧮 **Estimated number of draws to get {rarity_choice}:** {draws:.2f}")
+    st.write(f"🧮 **Estimated number of draws to get {rarity_choice}:** {draws}")
